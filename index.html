@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compound Market Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+    <h1>Compound Market Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Supply APY (%)</th>
+                <th>Borrow APY (%)</th>
+                <th>Total Supply (USD)</th>
+                <th>Total Borrow (USD)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for market in markets %}
+            <tr>
+                <td>{{ market['Symbol'] }}</td>
+                <td>{{ market['Supply APY (%)'] }}</td>
+                <td>{{ market['Borrow APY (%)'] }}</td>
+                <td>${{ market['Total Supply (USD)'] }}</td>
+                <td>${{ market['Total Borrow (USD)'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
