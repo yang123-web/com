@@ -1,39 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compound Market Data</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f4f4f4; }
-    </style>
-</head>
-<body>
-    <h1>Compound Market Data</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Symbol</th>
-                <th>Supply APY (%)</th>
-                <th>Borrow APY (%)</th>
-                <th>Total Supply (USD)</th>
-                <th>Total Borrow (USD)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for market in markets %}
-            <tr>
-                <td>{{ market['Symbol'] }}</td>
-                <td>{{ market['Supply APY (%)'] }}</td>
-                <td>{{ market['Borrow APY (%)'] }}</td>
-                <td>${{ market['Total Supply (USD)'] }}</td>
-                <td>${{ market['Total Borrow (USD)'] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+from flask import Flask, render_template
+import requests
+
+app = Flask(__name__)
+
+# Compound API URL
+COMPOUND_API_URL = "https://api.compound.finance/api/v2/ctoken"
+
+def fetch_compound_data():
+    """Fetches data from the Compound API."""
+    response = requests.get(COMPOUND_API_URL)
+    data = response.json()
+    markets = []
+    for market in data['cToken']:
+        markets.append({
+            "Symbol": market['symbol'],
+            "Supply APY (%)": round(float(market['supply_rate']['value']) * 100, 2),
+            "Borrow APY (%)": round(float(market['borrow_rate']['value']) * 100, 2),
+            "Total Supply (USD)": round(float(market['total_supply']['value']), 2),
+            "Total Borrow (USD)": round(float(market['total_borrows']['value']), 2),
+        })
+    return markets
+
+@app.route("/")
+def index():
+    """Homepage displaying Compound data."""
+    markets = fetch_compound_data()
+    return render_template("index.html", markets=markets)
+
+if __name__ == "__main__":
+    app.run(debug=True)
